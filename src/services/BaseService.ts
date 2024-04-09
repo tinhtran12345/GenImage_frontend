@@ -12,6 +12,13 @@ class BaseService {
             baseURL: baseURL,
             timeout: 100000,
         });
+        this.http.interceptors.response.use(
+            (response: any) => response,
+            (error: any) => {
+                const { response } = error;
+                return Promise.reject(response);
+            }
+        );
     }
 
     public setConfigHeaders() {
