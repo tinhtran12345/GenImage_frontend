@@ -1,12 +1,9 @@
-import React, {
-    Dispatch,
-    SetStateAction,
-    useContext,
-    useRef,
-    useState,
-} from "react";
+import React, { useContext, useRef, useState } from "react";
 
-import { ImageContext, ImageContextType } from "../context/ImageProvider";
+import { ImageContext, ImageContextType } from "../../context/ImageProvider";
+
+import FileSaver from "file-saver";
+import { copyTextToClipBoard } from "../../utils/copyTextToClipBoard";
 
 type Action = {
     isCopied: boolean;
@@ -19,12 +16,14 @@ const ImageModel = () => {
         isCopied: false,
         isDownloaded: false,
     });
-    const {
-        imageModelState,
-        setImageModelState,
-        updateImageState,
-        clearModelContent,
-    } = useContext(ImageContext) as ImageContextType;
+    const { imageModelState, setImageModelState, clearModelContent } =
+        useContext(ImageContext) as ImageContextType;
+
+    const clearAction = () => {
+        setTimeout(() => {
+            setAction({ ...action, isCopied: false, isDownloaded: false });
+        }, 500);
+    };
 
     const handleClose = () => {
         setImageModelState({
@@ -32,8 +31,44 @@ const ImageModel = () => {
             open: false,
         });
         clearModelContent();
+        clearAction();
     };
-    console.log(imageModelState);
+
+    const handleCopyImage = async (url: string | null) => {
+        if (!url) {
+            return;
+        }
+        try {
+            await copyTextToClipBoard(url).then(() => {
+                setAction((prev) => ({
+                    ...prev,
+                    isCopied: true,
+                }));
+                setTimeout(() => {
+                    setAction((prev) => ({
+                        ...prev,
+                        isCopied: false,
+                    }));
+                }, 3000);
+            });
+        } catch (error) {
+            console.log(error);
+            alert("something went wrong");
+        }
+    };
+
+    const handleDownload = (url: string | null) => {
+        if (url) {
+            FileSaver.saveAs(
+                url,
+                `download_${new Date().toLocaleDateString()}.jpeg`
+            );
+        }
+        setAction((prev) => ({
+            ...prev,
+            isDownloaded: true,
+        }));
+    };
 
     return (
         <>
@@ -81,13 +116,17 @@ const ImageModel = () => {
                                                 d="M21 7L9 19l-5.5-5.5l1.41-1.41L9 16.17L19.59 5.59L21 7Z"
                                             />
                                         </svg>
-                                        Copied
+                                        Copied URL
                                     </button>
                                 ) : (
                                     <button
                                         type="button"
                                         className="w-[150px] p-3 flex gap-2 items-center hover:text-white rounded-md capitalize  border border-purple-600 hover:bg-purple-500 text-purple-600"
-                                        // onClick={() => handleCopyImage(imgSrc)}
+                                        onClick={() =>
+                                            handleCopyImage(
+                                                imageModelState.imgSrc
+                                            )
+                                        }
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +140,7 @@ const ImageModel = () => {
                                                 d="M5 22q-.825 0-1.413-.588T3 20V6h2v14h11v2H5Zm4-4q-.825 0-1.413-.588T7 16V4q0-.825.588-1.413T9 2h9q.825 0 1.413.588T20 4v12q0 .825-.588 1.413T18 18H9Zm0-2h9V4H9v12Zm0 0V4v12Z"
                                             />
                                         </svg>
-                                        Copy
+                                        Copy URL
                                     </button>
                                 )}
 
@@ -128,7 +167,11 @@ const ImageModel = () => {
                                     <button
                                         type="button"
                                         className="w-[150px] p-3 flex gap-2 items-center rounded-md capitalize border-none bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-2 focus:outline-none focus:ring-purple-200"
-                                        // onClick={() => handleDownload(imgSrc)}
+                                        onClick={() =>
+                                            handleDownload(
+                                                imageModelState.imgSrc
+                                            )
+                                        }
                                     >
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"

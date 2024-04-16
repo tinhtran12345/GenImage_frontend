@@ -1,13 +1,12 @@
 import React, { FC } from "react";
+import Logo from "./Logo/Logo";
 
 const Header: FC = () => {
     return (
         <header>
-            <nav className="border-gray-200 px-4 lg:px-6 py-3">
-                <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
-                    <h1 className="pb-3 animate-text text-center bg-gradient-to-r from-green-200 via-green-400 to-purple-700 bg-clip-text text-transparent text-md sm:text-6xl font-black">
-                        GenImage & Sell
-                    </h1>
+            <nav className="border-gray-200 px-4 lg:px-6 py-3 w-full h-[90px] ">
+                <div className="mt-3 flex flex-wrap justify-between items-center mx-auto max-w-screen-xl text-4xl md:text-6xl">
+                    <Logo content="GenI." />
                     <div className="pb-4 flex items-center lg:order-2 gap-x-3">
                         <a
                             href="https://github.com/tinhtran12345"
